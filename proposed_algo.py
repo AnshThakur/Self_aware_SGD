@@ -1,3 +1,7 @@
+"""
+Implementation of self-aware SGD.
+"""
+
 import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
@@ -60,16 +64,13 @@ def self_aware_SGD(model,W,train_loader,val_loader,loss_fn,opt,name,epochs=50):
 #                print(pred)
 #                print(label)
   
-            if pred < 0.4:  # oracle output 0 implies gradient consistent. This threshold could be a hyperparameter. We are keeping it fixed. 
+            if pred < 0.4:  # oracle output 0 implies gradient consistency. This threshold could be a hyperparameter. We are keeping it fixed. 
                 opt.apply_gradients(zip(grad,model.trainable_variables))
-   
                 W1 = model.get_weights()
                 diff_grad = get_diff(W,W1) # updating historic gradient to reflect the recent changes
-            
             loss += 1
 
         Training_loss.append(loss/(i+1)) 
-        
         Preds, Labels = get_predictions(model, val_loader)
         auc = roc_auc_score(Labels, Preds)
         
@@ -133,7 +134,7 @@ def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
     ind_neg = np.where(R<(-1*tau))[0]  # get index of batches that had negative impact, hence are noisy    
     F1 = F[ind_neg,:]
     print(ind_neg.shape)
-    #R1 = R[ind]
+    #R1 = R[ind_neg]
 
     ind_pos = np.where(R>tau)[0]  # get index of batches that had positive impact, hence are not noisy    
     F0 = F[ind_pos,:]
