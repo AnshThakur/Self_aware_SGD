@@ -1,3 +1,7 @@
+"""
+Helper functions for project.
+"""
+
 import numpy as np
 import tensorflow as tf
 
@@ -7,21 +11,22 @@ def get_diff(A,B):
     
     for list1_i, list2_i in zip_object:
         difference.append(list1_i-list2_i)
-    #print(difference)
+
     return difference      
 
 
 def add_noise(labels,C):
-    L = []
-    for i in range(0,len(labels)):
-        a = np.random.choice(2, p=C[labels[i]]) # choice is between two classes 0 and 1
-        L.append(a)
+    """
+    Randomly chooses between 0 and 1 for each label 
+    with probabilities from C.
+    """
+    L = [np.random.choice(2, p=C[label]) for label in labels]
     return np.stack(L)
 
 
 def simulate_label_noise(labels,total_batches,ind,perc,C):
-    X=tf.random.uniform([total_batches], minval=0, maxval=1,seed=10)
-    l=0
+    X = tf.random.uniform([total_batches], minval=0, maxval=1, seed=10)
+    l = 0
     if X[ind] > (1-perc):
        labels = add_noise(labels,C)
        l = 1
