@@ -64,16 +64,13 @@ def self_aware_SGD(model,W,train_loader,val_loader,loss_fn,opt,name,epochs=50):
 #                print(pred)
 #                print(label)
   
-            if pred < 0.4:  # oracle output 0 implies gradient consistent. This threshold could be a hyperparameter. We are keeping it fixed. 
+            if pred < 0.4:  # oracle output 0 implies gradient consistency. This threshold could be a hyperparameter. We are keeping it fixed. 
                 opt.apply_gradients(zip(grad,model.trainable_variables))
-   
                 W1 = model.get_weights()
                 diff_grad = get_diff(W,W1) # updating historic gradient to reflect the recent changes
-            
             loss += 1
 
         Training_loss.append(loss/(i+1)) 
-        
         Preds, Labels = get_predictions(model, val_loader)
         auc = roc_auc_score(Labels, Preds)
         
