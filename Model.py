@@ -10,9 +10,6 @@ from tensorflow.keras import layers
 from sklearn.metrics import roc_auc_score
 from torch.utils.data import Dataset
 
-# Local imports
-from Oracle import Oracle_Phase1
-
 SEED=10
 random.seed(SEED)
 torch.manual_seed(SEED)
