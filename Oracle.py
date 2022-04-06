@@ -12,13 +12,12 @@ class Oracle_Phase1(tf.keras.Model):
         self.d2 = layers.Dense(4, activation='relu')
         self.d3 = layers.Dense(1, activation='sigmoid')
 
-    # `train` kwarg has no effect
-    def forward(self, x,train=False):
+    def forward(self, x):
         x = self.d1(x)
         x = self.d2(x)
         x = self.d3(x)     
         return x
 
     def call(self, inputs):
-        x = self.forward(inputs,train=False)
+        x = self.forward(inputs)
         return x 
