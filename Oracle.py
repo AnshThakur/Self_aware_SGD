@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Bandit model.
+"""
 
 import tensorflow as tf
 from tensorflow.keras import layers
