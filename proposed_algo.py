@@ -137,7 +137,7 @@ def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
     ind_neg = np.where(R<(-1*tau))[0]  # get index of batches that had negative impact, hence are noisy    
     F1 = F[ind_neg,:]
     print(ind_neg.shape)
-    #R1 = R[ind]
+    #R1 = R[ind_neg]
 
     ind_pos = np.where(R>tau)[0]  # get index of batches that had positive impact, hence are not noisy    
     F0 = F[ind_pos,:]
