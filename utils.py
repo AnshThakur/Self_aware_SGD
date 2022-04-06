@@ -3,7 +3,7 @@ Helper functions for project.
 """
 
 import numpy as np
-import tensorflow as tf
+from tensorflow.random import uniform
 
 def get_diff(A,B):
     difference = []
@@ -25,15 +25,18 @@ def add_noise(labels,C):
 
 
 def simulate_label_noise(labels,total_batches,ind,perc,C):
-    X = tf.random.uniform([total_batches], minval=0, maxval=1, seed=10)
+    X = uniform([total_batches], minval=0, maxval=1, seed=10)
     l = 0
+
     if X[ind] > (1-perc):
        labels = add_noise(labels,C)
        l = 1
     return labels, l  
 
-## transition matrix
 def flip_labels_C(corruption_prob, num_classes, seed=1):
+    """
+    Transition matrix.
+    """
     np.random.seed(seed)
     C = np.eye(num_classes) * (1 - corruption_prob)
     row_indices = np.arange(num_classes)

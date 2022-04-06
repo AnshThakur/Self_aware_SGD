@@ -3,9 +3,9 @@ Bandit model.
 """
 
 import tensorflow as tf
-from tensorflow.keras import layers
+from tensorflow.keras import layers, Model
 
-class Oracle_Phase1(tf.keras.Model):
+class Oracle_Phase1(Model):
     def __init__(self, **kwargs):
         super().__init__()
         self.d1 = layers.Dense(8, activation='relu')

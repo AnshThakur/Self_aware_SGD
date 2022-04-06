@@ -5,8 +5,8 @@ Model definition code. It also contains the list of features used for the task o
 import random
 import torch
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import layers
+from tensorflow import GradientTape
+from tensorflow.keras import layers, Model
 from sklearn.metrics import roc_auc_score
 from torch.utils.data import Dataset
 
@@ -14,13 +14,13 @@ SEED=10
 random.seed(SEED)
 torch.manual_seed(SEED)
 
-class Respiratory_Deteroration(tf.keras.Model):
+class Respiratory_Deteroration(Model):
     def __init__(self, **kwargs):
         super().__init__()
         self.d1 = layers.Dense(308, activation='relu')
-        self.dropout1 = tf.keras.layers.Dropout(0.25)        
+        self.dropout1 = layers.Dropout(0.25)        
         self.d2 = layers.Dense(231, activation='relu')
-        self.dropout2 = tf.keras.layers.Dropout(0.25)
+        self.dropout2 = layers.Dropout(0.25)
         self.d3 = layers.Dense(1, activation='sigmoid')
 
     def forward(self, x,train=False):
@@ -86,7 +86,7 @@ def normal_model_training(model,train_loader,val_loader,loss_fn,opt,name,epochs=
             ind = np.where(targets>0)[0]
             targets[ind] = 1
             
-            with tf.GradientTape() as tape1:
+            with GradientTape() as tape1:
                  p = model.forward(inputs, train=True)[:,0]
                  l = loss_fn(p, targets)
             
