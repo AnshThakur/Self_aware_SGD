@@ -2,7 +2,6 @@
 Bandit model.
 """
 
-import tensorflow as tf
 from tensorflow.keras import layers, Model
 
 class Oracle_Phase1(Model):
