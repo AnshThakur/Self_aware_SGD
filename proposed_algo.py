@@ -17,7 +17,7 @@ def self_aware_SGD(model,W,train_loader,val_loader,loss_fn,opt,name,epochs=50):
     # batch and example probabilities for noise simulation
     b = 0.5
     p = 0.8
-    C = flip_labels_C(p,2, seed=1) # transition matrix to simulate label noise
+    C = flip_labels_C(p, 2, seed=1) # transition matrix to simulate label noise
 
     # bandit training
     tau = 0.0000001 # threshold for rewards
@@ -87,8 +87,8 @@ def self_aware_SGD(model,W,train_loader,val_loader,loss_fn,opt,name,epochs=50):
     
 def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
     
-    opt = tf.keras.optimizers.SGD(learning_rate=0.01,momentum=0.0,nesterov=False) 
-    M = tf.concat([tf.reshape(x,[-1]) for x in diff_grad],axis=0) # historic gradient vectorisation
+    opt = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.0, nesterov=False) 
+    M = tf.concat([tf.reshape(x,[-1]) for x in diff_grad], axis=0) # historic gradient vectorisation
     W = model.get_weights()
     
     Features = []
@@ -104,7 +104,7 @@ def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
         inputs, targets = data
         inputs = inputs.numpy()
         targets = targets.numpy()
-        targets, label = simulate_label_noise(targets,len(train_loader),i,b,C) # if we want to simulate noise           
+        targets, _ = simulate_label_noise(targets, len(train_loader), i, b, C) # if we want to simulate noise           
        
         with tf.GradientTape() as tape1:
              p = model.forward(inputs,train=False)[:,0]
@@ -113,12 +113,11 @@ def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
         grad = tape1.gradient(l,model.trainable_variables)  
       
         # compute features to the oracle/bandit model
-        G = tf.concat([tf.reshape(x,[-1]) for x in grad],axis=0) 
+        G = tf.concat([tf.reshape(x,[-1]) for x in grad], axis=0) 
         grad_norm = tf.norm(G)
         cosine = tf.reduce_sum(G*M)/(tf.norm(G)*tf.norm(M))
         A = np.array([grad_norm,cosine]) # representing this gradient update
         Features.append(A) # append to list, to be used later for training bandit model
-        
 
         # impact of applying gradient to the initial model
         opt.apply_gradients(zip(grad,model.trainable_variables))    
@@ -128,16 +127,18 @@ def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
     
         model.set_weights(W) # revert to the initial state
         
-        
     F = np.array(Features)
     R = np.array(Reward)
-    ind = np.where(R<(-1*tau))[0]  # get index of batches that had negative impact, hence are noisy    
-    F1 = F[ind,:]
-    print(ind.shape)
+
+    ind_neg = np.where(R<(-1*tau))[0]  # get index of batches that had negative impact, hence are noisy    
+    F1 = F[ind_neg,:]
+    print(ind_neg.shape)
     #R1 = R[ind]
-    ind = np.where(R>tau)[0]  # get index of batches that had positive impact, hence are not noisy    
-    F0 = F[ind,:]
-    print(ind.shape)
+
+    ind_pos = np.where(R>tau)[0]  # get index of batches that had positive impact, hence are not noisy    
+    F0 = F[ind_pos,:]
+    print(ind_pos.shape)
+
     # prepare data for bandit training
     FF = np.concatenate((F1,F0))
     labels = np.concatenate((np.ones(len(F1)), np.zeros(len(F0))))
@@ -148,10 +149,10 @@ def get_trained_bandit(model,train_loader,val_loader,loss_fn,diff_grad,tau,b,C):
         oracle.build((None,2)) 
         oracle.compile(optimizer='adam', loss=tf.keras.losses.MeanAbsoluteError())
         check = tf.keras.callbacks.ModelCheckpoint('./oracle.h5',monitor="loss",verbose=1,save_best_only=True,save_weights_only=True,mode="min",save_freq="epoch")
-        hist = oracle.fit(x=FF,y=labels,batch_size=512,epochs=2500,callbacks=[check],shuffle=True)
-        if hist.history['loss'][-1]<0.2:
+        hist = oracle.fit(x=FF, y=labels, batch_size=512, epochs=2500, callbacks=[check], shuffle=True)
+
+        if hist.history['loss'][-1] < 0.2:
            break 
     
     oracle.load_weights('./oracle.h5') ## load the stored weights 
     return oracle 
-        
