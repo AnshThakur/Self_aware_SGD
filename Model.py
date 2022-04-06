@@ -23,7 +23,7 @@ class Respiratory_Deteroration(Model):
         self.dropout2 = layers.Dropout(0.25)
         self.d3 = layers.Dense(1, activation='sigmoid')
 
-    def forward(self, x,train=False):
+    def forward(self, x, train=False):
         x = self.d1(x)
         x = self.dropout1(x, training=train)
         x = self.d2(x)
@@ -68,11 +68,11 @@ def get_predictions(model,loader):
     return np.concatenate(pred_prob), np.concatenate(true_labels)
         
 def normal_model_training(model,train_loader,val_loader,loss_fn,opt,name,epochs=50):
-    best=0
     TL=[]
     VL=[]
     Val_auc=[]
-    BE=0
+    best_val_auc=0
+    best_epoch=0
 
     for epoch in range(0, epochs):
         loss = 0
@@ -102,14 +102,15 @@ def normal_model_training(model,train_loader,val_loader,loss_fn,opt,name,epochs=
         VL.append(loss_fn(Preds,Labels))
         Val_auc.append(val_auc)
         
-        if best < val_auc:
-           best = val_auc
+        if val_auc > best_val_auc:
+           best_val_auc = val_auc
            model.save_weights(f'./models/{name}.h5')
-           BE = epoch
+           best_epoch = epoch
            
         print(f"Epoch: {epoch:.1f} Train Loss: {TL[-1]:.5f} Val Loss: {VL[-1]:.5f} Test: {Val_auc[-1]:.5f}")   
         
-        if (epoch-BE) > 25:
+        # Early stopping
+        if (epoch-best_epoch) > 25:
            break 
 
     model.load_weights(f'./models/{name}.h5')
@@ -117,7 +118,7 @@ def normal_model_training(model,train_loader,val_loader,loss_fn,opt,name,epochs=
     return TL, VL, Val_auc, model    
 
             
-all_no_baseline = ['age', 'sex', 'Vital_Signs HR', 'Vital_Signs RR', 'Vital_Signs SBP', 'Vital_Signs TEMP',
+feature_names = ['age', 'sex', 'Vital_Signs HR', 'Vital_Signs RR', 'Vital_Signs SBP', 'Vital_Signs TEMP',
                    'Vital_Signs SPO2', 'Vital_Signs FiO2', 'Vital_Signs masktyp', 'Vital_Signs avpu',
                    'Blood_Test ALT-IU/L', 'Blood_Test CRP-mg/L', 'Blood_Test Albumin-g/L', 'Blood_Test Urea-mmol/L',
                    'Blood_Test Sodium-mmol/L', 'Blood_Test Haematocrit-L/L', 'Blood_Test Haemoglobin-g/dL',
@@ -139,8 +140,4 @@ all_no_baseline = ['age', 'sex', 'Vital_Signs HR', 'Vital_Signs RR', 'Vital_Sign
                    'Delta_Mean_Vital_Signs SPO2', 'Var_Mean_Vital_Signs FiO2', 'Max_Min_Vital_Signs FiO2',
                    'Delta_Mean_Vital_Signs FiO2', 'Var_Mean_Vital_Signs masktyp', 'Max_Min_Vital_Signs masktyp',
                    'Delta_Mean_Vital_Signs masktyp', 'Var_Mean_Vital_Signs avpu', 'Max_Min_Vital_Signs avpu',
-                   'Delta_Mean_Vital_Signs avpu']
-
-
-def get_names_of_predefined_feature_sets():
-    return all_no_baseline            
+                   'Delta_Mean_Vital_Signs avpu']         
