@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Model definition code.
+Model definition code. It also contains the list of features used for the task of respiratory deterioration prediction.
 """
 
 import random
