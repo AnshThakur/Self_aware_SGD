@@ -23,6 +23,7 @@ def self_aware_SGD(model, W, train_loader, val_loader, loss_fn, opt, name, epoch
 
     W1 = model.get_weights()
     diff_grad = get_diff(W, W1) # historic gradient
+    weights_loc = f'./models/{name}.h5'
 
     C = flip_labels_C(p, 2) # transition matrix to simulate label noise
 
@@ -31,15 +32,13 @@ def self_aware_SGD(model, W, train_loader, val_loader, loss_fn, opt, name, epoch
     
     # training begins
     Training_loss = []
-    Val_auc = []
-    best_auc = 0  # best val score
+    val_aucs = []
+    best_val_auc = 0  # best val score
 
     for epoch in range(0, epochs):
         loss = 0
         
-        for i, data in enumerate(train_loader):
-            inputs, targets = data
-            
+        for i, (inputs, targets) in enumerate(train_loader):
             inputs = inputs.numpy()
             targets = targets.numpy()
 
@@ -72,18 +71,17 @@ def self_aware_SGD(model, W, train_loader, val_loader, loss_fn, opt, name, epoch
 
         Training_loss.append(loss/(i+1))
         Preds, Labels = get_predictions(model, val_loader)
-        auc = roc_auc_score(Labels, Preds)
-        
-        Val_auc.append(auc)
+        val_auc = roc_auc_score(Labels, Preds)
+        val_aucs.append(val_auc)
         
         # checkpoint to store best model
-        if auc > best_auc:
-           best_auc = auc
-           model.save_weights(f'./models/{name}.h5')
+        if val_auc > best_val_auc:
+           best_val_auc = val_auc
+           model.save_weights(weights_loc)
         
-        print(f"Epoch: {epoch:.1f} Val Auc: {auc:.5f}")    
+        print(f"Epoch: {epoch:.1f} \nVal Auc: {val_auc:.5f}")    
          
-    model.load_weights(f'./models/{name}.h5') # load the best model config
+    model.load_weights(weights_loc) # load the best model config
 
     return model
 
