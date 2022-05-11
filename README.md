@@ -7,7 +7,7 @@ To run experiments, either create a venv with the appropriate requirements and r
 
 ```python
 conda env create -f environment.yml
-conda activate env-01
+conda activate env-sgd
 ```
 
 or alrternatively, directly run the notebook on Google Colab:

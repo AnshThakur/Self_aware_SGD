@@ -1,4 +1,4 @@
-name: env-01
+name: env-sgd
 
 channels:
   - conda-forge
