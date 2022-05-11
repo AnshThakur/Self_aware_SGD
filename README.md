@@ -10,6 +10,6 @@ conda env create -f environment.yml
 conda activate env-sgd
 ```
 
-or alrternatively, directly run the notebook on Google Colab:
+Alternatively, you can run the notebook directly on Google Colab:
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AnshThakur/Self_aware_SGD/blob/main/demo_main.ipynb)
