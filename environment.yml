@@ -9,13 +9,12 @@ dependencies:
 
   # Core scientific python
   - numpy
+  - pandas
   - tqdm
-  
-  # Plotting
-  - matplotlib
 
   # Machine Learning
   - scikit-learn
+  - tensorflow
   - pytorch::pytorch
   - pytorch::torchvision
   - cudatoolkit=11.3

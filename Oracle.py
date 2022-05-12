@@ -4,6 +4,7 @@ Bandit model.
 
 from tensorflow.keras import layers, Model
 
+
 class Oracle_Phase1(Model):
     def __init__(self, **kwargs):
         super().__init__()
@@ -14,9 +15,9 @@ class Oracle_Phase1(Model):
     def forward(self, x):
         x = self.d1(x)
         x = self.d2(x)
-        x = self.d3(x)     
+        x = self.d3(x)
         return x
 
     def call(self, inputs):
         x = self.forward(inputs)
-        return x 
+        return x

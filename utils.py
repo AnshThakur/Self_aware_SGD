@@ -5,11 +5,13 @@ Helper functions for project.
 import numpy as np
 from tensorflow.random import uniform
 
-def get_diff(A,B):
+
+def get_diff(A, B):
     """
     Get the difference between elements of two lists.
     """
-    return [a-b for a,b in zip(A,B)]
+    return [a-b for a, b in zip(A, B)]
+
 
 def add_noise(labels, C):
     """
@@ -17,15 +19,17 @@ def add_noise(labels, C):
     """
     return np.stack([np.random.choice(2, p=C[label]) for label in labels])
 
+
 def simulate_label_noise(labels, total_batches, ind, perc, C, seed=10):
     X = uniform([total_batches], seed=seed)
     l = 0
 
     if X[ind] > (1-perc):
-       labels = add_noise(labels, C)
-       l = 1
-    
-    return labels, l  
+        labels = add_noise(labels, C)
+        l = 1
+
+    return labels, l
+
 
 def flip_labels_C(corruption_prob, num_classes, seed=1):
     """
@@ -37,5 +41,5 @@ def flip_labels_C(corruption_prob, num_classes, seed=1):
 
     for i in range(num_classes):
         C[i][np.random.choice(row_indices[row_indices != i])] = corruption_prob
-    
+
     return C
